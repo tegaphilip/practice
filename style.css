@@ -1,0 +1,142 @@
+body {
+	/*background-color: rgb(52,117,203);*/
+    background-image: url("bg.jpg");
+    font-family: "Trebuchet MS";
+    width: 100%;
+    margin: 0;
+}
+
+header {
+    border-top: 2px solid darkblue;
+    border-bottom: 2px solid darkblue;
+    font-size: 26px;
+    text-align: center;
+}
+
+header a {
+    text-decoration: none;
+    color: black;
+}
+
+section {
+   min-height: 40px;
+}
+
+#section2 {
+    border-bottom: 2px solid darkblue;
+}
+
+#section3 {
+    border-bottom: 2px solid darkblue;
+}
+
+#section1 {
+    padding-top: 5px;
+    padding-left: 10px;
+    border-bottom: 2px solid darkblue;
+}
+
+#section1 #add-recipe-label {
+    display: inline-block;
+    vertical-align: top;
+}
+
+#section1 #logout-button {
+    margin-left: 10px;
+    display: inline-block;
+    vertical-align: top;
+    width: 40%;
+}
+
+#section1 #register-label {
+    text-align: center;
+}
+
+#login-form {
+	display: inline-block;
+}
+
+#register-link{
+	display: inline-block;
+    margin-right: 100px;
+}
+#new-recipe-link{
+    display: inline-block;
+    float: right;
+}
+
+input[type=text], input[type=password] {
+    width: 150px;
+    height: 30px;
+}
+
+button {
+    min-width: 100px;
+    height: 30px;
+    border: 1px solid darkblue;
+    border-radius: 5px;
+    background-color: white;
+}
+
+#section2 #filter-form * {
+    margin-left: 10px;
+    margin-top: 2px;
+    margin-bottom: auto;
+    display: inline-block;
+}
+
+#label-for-only-recipes {
+    margin-left: 0px;
+}
+
+#section2 #filter-form #filter {
+    float: right;
+}
+
+#section3 #instruction{
+    text-align: center;
+    margin-top: 10px;
+}
+
+#section4 #recipe-list {
+    background-color: white;
+}
+
+.alternate {
+    background-color: aliceblue;
+}
+
+#add-recipe-form input[type=text],textarea {
+    width: 100%;
+}
+
+#add-recipe-form input[type=text]{
+    height: 20px;
+}
+
+#section4 #tag-popup-area {
+    margin-right: 40px;
+}
+
+#section4 #tag-popup-area .tag-popup {
+    background-color: #CCCCCC;
+    font-size: 12px;
+    border: 1px solid darkslateblue;
+}
+
+#section4 #add-recipe-form {
+
+}
+
+.flat-black {
+    background-color: darkslateblue;
+    border-radius: 0;
+}
+
+.error {
+    color: red;
+}
+
+.info {
+    color: blue;
+}
