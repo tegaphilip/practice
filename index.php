@@ -1,9 +1,27 @@
 <?php
 session_start();
+require_once 'classes/Recipe.php';
+require_once 'classes/Util.php';
+
 $error_message = "";
 if (isset($_SESSION['error_message'])) {
     $error_message = $_SESSION['error_message'];
     unset($_SESSION['error_message']);
+}
+
+$recipe = new Recipe();
+$util = new Util();
+
+$recipes = array();
+if (isset($_GET['name']) || isset($_GET['description']) || isset($_GET['tags']) || isset($_GET['country']) || isset($_GET['only_mine'])) {
+    $name = isset($_GET['name']) ? $_GET['name'] : "";
+    $description = isset($_GET['description']) ? $_GET['description'] : "";
+    $tags = isset($_GET['tags']) ? $_GET['tags'] : "";
+    $country = isset($_GET['country']) ? $_GET['country'] : "";
+    $onlyMine = isset($_GET['only_mine']) && $_GET['only_mine'] == "on" ? 1 : 0;
+    $recipes = $recipe->getFilteredRecipes($name, $description, $tags, $country, $onlyMine);
+} else {
+    $recipes = $recipe->getAllRecipes();
 }
 ?>
 <!DOCTYPE html>
@@ -43,11 +61,19 @@ if (isset($_SESSION['error_message'])) {
 
             The Recipes!
             <?php if (isset($_SESSION['is_logged_in'])) {
-                ?>
-                <a href="add_recipe.php" id="new-recipe-link">
-                    <button>Add New Recipe</button>
-                </a>
-                <?php
+                if ($_SESSION['admin'] == 0) {
+                    ?>
+                    <a href="add_recipe.php" id="new-recipe-link">
+                        <button>Add New Recipe</button>
+                    </a>
+                    <?php
+                } else {
+                    ?>
+                    <a href="#" id="new-recipe-link">
+                        <button>Admin Settings</button>
+                    </a>
+                    <?php
+                }
             } ?>
 
         </section>
@@ -55,24 +81,26 @@ if (isset($_SESSION['error_message'])) {
         <section id="section2">
             <form method="get" id="filter-form">
                 <span>Filter</span>
-                <input type="text" id="name" name="name" placeholder="Name"/><input type="text" id="descriptions"
-                                                                                     name="description"
-                                                                                     placeholder="Description"/>
-                <input type="text" id="tags" name="tags" placeholder="Tag(s)"/>
+                <input type="text" id="name" name="name" placeholder="Name" value="<?php if(isset($_GET['name'])) {echo $_GET['name'];} ?>"/>
+                <input type="text" id="descriptions" name="description" placeholder="Description" value="<?php if(isset($_GET['description'])) {echo $_GET['description'];} ?>"/>
+                <input type="text" id="tags" name="tags" placeholder="Tag(s)" value="<?php if(isset($_GET['tags'])) {echo $_GET['tags'];} ?>"/>
+
                 <select name="country" id="country">
                     <option value="">Country</option>
-                    <option value="China">China</option>
-                    <option value="France">France</option>
-                    <option value="Germany">Germany</option>
-                    <option value="Ghana">Ghana</option>
-                    <option value="India">India</option>
-                    <option value="Nepal">Nepal</option>
-                    <option value="Nigeria">Nigeria</option>
-                    <option value="USA">USA</option>
-                </select>
-                <?php if (isset($_SESSION['is_logged_in'])) {
+                    <?php
+                    $countries = require_once('_country.php');
+                        foreach  ($countries as $key => $value) {
+                        ?>
+                        <option value="<?php echo $key;?>" <?php if (isset($_GET['country']) && $key == $_GET['country']) { echo "selected";} ?>>
+                            <?php echo $value; ?>
+                        </option>
+                        <?php
+                        }
                     ?>
-                    <input type="checkbox" name="only_mine" id="only-mine"/>
+                </select>
+                <?php if (isset($_SESSION['is_logged_in']) && $_SESSION['admin'] == 0) {
+                    ?>
+                    <input type="checkbox" name="only_mine" id="only-mine" <?php if (isset($_GET['only_mine']) && $_GET['only_mine'] == "on") {echo "checked";} ?>/>
                     <label for="only-mine" id="label-for-only-recipes">Only my recipes</label>
                     <?php
                 } ?>
@@ -81,10 +109,10 @@ if (isset($_SESSION['error_message'])) {
             </form>
         </section>
         <section id="section3">
-            <div id="instruction">(Click a recipe to view it or modify ones you have permissions to)</div>
+            <div id="instruction">(Click a recipe to view more details)</div>
         </section>
         <section id="section4">
-            <table width="100%" cellpadding="2" cellspacing="2" id="recipe-list">
+            <table width="100%" cellpadding="5" cellspacing="5" id="recipe-list">
                 <tr align="left" class="alternate">
                     <th>Name</th>
                     <th>Description</th>
@@ -92,131 +120,37 @@ if (isset($_SESSION['error_message'])) {
                     <th>Username</th>
                 </tr>
 
-                <tr>
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
+                <?php
+                $i = 0;
+                foreach ($recipes as $line) {
+                    ?>
+                        <tr class="<?php echo $i % 2 == 0 ? '' : 'alternate'; ?>">
+                            <td>
+                                <a class="no-decorate" href="view_recipe.php?recipe_id=<?php echo $util->encryptPK($line['recipe_id']); ?>">
+                                    <?php echo $line['recipe_name'];?>
+                                </a>
+                            </td>
+                            <td>
+                                <a class="no-decorate" href="view_recipe.php?recipe_id=<?php echo $util->encryptPK($line['recipe_id']); ?>">
+                                    <?php echo $line['description'];?>
+                                </a>
+                            </td>
+                            <td>
+                                <a class="no-decorate" href="view_recipe.php?recipe_id=<?php echo $util->encryptPK($line['recipe_id']); ?>">
+                                    <?php echo $line['country'];?>
+                                </a>
+                            </td>
+                            <td>
+                                <a class="no-decorate" href="view_recipe.php?recipe_id=<?php echo $util->encryptPK($line['recipe_id']); ?>">
+                                    <?php echo $line['username'];?>
+                                </a>
+                            </td>
+                        </tr>
 
-                <tr class="alternate">
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
-
-                <tr>
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
-
-                <tr class="alternate">
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
-
-                <tr>
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
-
-                <tr class="alternate">
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
-
-                <tr>
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
-
-                <tr class="alternate">
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
-
-                <tr>
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
-
-                <tr class="alternate">
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
-
-                <tr>
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
-
-                <tr class="alternate">
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
-
-                <tr>
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
-
-                <tr class="alternate">
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
-
-                <tr>
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
-
-                <tr class="alternate">
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
-
-                <tr>
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
-
-                <tr class="alternate">
-                    <td>Name 1</td>
-                    <td>Description 1</td>
-                    <td>Country 1</td>
-                    <td>Username 1</td>
-                </tr>
+                    <?php
+                    $i++;
+                }
+                ?>
             </table>
         </section>
     </body>

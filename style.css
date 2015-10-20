@@ -134,3 +134,8 @@ button {
 .info {
     color: blue;
 }
+
+.no-decorate {
+    text-decoration: none;
+    color: inherit;
+}

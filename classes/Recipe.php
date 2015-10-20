@@ -1,6 +1,7 @@
 <?php
 
 require_once 'DBConnection.php';
+require_once 'Util.php';
 
 class Recipe
 {
@@ -46,7 +47,8 @@ class Recipe
         $description = $mysqli->real_escape_string($description);
         $id = $_SESSION['user_id'];
 
-        $sql = "INSERT INTO recipes (name, description, country, userID) VALUES ('$name','$description','$country','$id')";
+        $sql = "INSERT INTO recipes (name, description, country, userID, date_added) VALUES
+                                    ('$name','$description','$country', $id, '".date("Y-m-d H:i:s")."')";
         $insertId = $dbConnection->executeInsert($sql);
         if (empty($insertId)) {
             $_SESSION['error_message'] = "Recipe creation failed";
@@ -97,13 +99,9 @@ class Recipe
         $sql = "UPDATE recipes
                     SET name = '$name',
                         description = '$description',
-                        country = '$country',
+                        country = '$country'
                 WHERE id = $recipeId";
-        $result = $dbConnection->executeUpdate($sql);
-        if (empty($result)) {
-            $_SESSION['error_message'] = "Recipe update failed";
-            return false;
-        }
+        $dbConnection->executeUpdate($sql);
 
         //check whether tags need to be updated
         $recipeDetails = $this->getRecipeAndTags($recipeId);
@@ -124,13 +122,13 @@ class Recipe
         if ($tags_in_db != $tags_submitted_during_update) {
             //update the tags
             //first delete existing ones then update the others
-            $sql = "DELETE FROM tags WHERE recipeID = $recipeId";
+            $sql = "DELETE FROM recipetags WHERE recipeID = $recipeId";
             $dbConnection->executeUpdate($sql);
 
             //then insert the newly posted tags
             foreach ($tags_submitted_during_update as $tag_id) {
-                $sql = "INSERT INTO recipe_tags (recipeID, tagID) VALUES ($recipeId, $tag_id)";
-                $dbConnection->executeUpdate($sql);
+                $sql = "INSERT INTO recipetags (recipeID, tagID) VALUES ($recipeId, $tag_id)";
+                $dbConnection->executeInsert($sql);
             }
         }
 
@@ -172,8 +170,92 @@ class Recipe
      */
     public function getRecipeOnly($recipeId)
     {
-        $sql = "SELECT * FROM recipe WHERE id = $recipeId";
+        $sql = "SELECT * FROM recipes WHERE id = $recipeId";
         $dbConnection = new DBConnection();
         return $dbConnection->getSingleResultSet($sql);
+    }
+
+    /**
+     * @return array|bool
+     */
+    public function getAllRecipes()
+    {
+        $db = new DBConnection();
+        $sql = "SELECT
+                    r.id AS recipe_id,
+                    r.name AS recipe_name,
+                    r.description,
+                    r.country,
+                    users.username
+                FROM recipes r
+                LEFT JOIN users ON (users.id = r.userID)
+                ORDER BY date_added DESC";
+        return $db->getMultipleResultSet($sql);
+    }
+
+
+    /**
+     * Get a list of recipes based on supplied filters
+     * @param $name
+     * @param $description
+     * @param $tags
+     * @param $country
+     * @param int $onlyMine
+     * @return mixed
+     */
+    public function getFilteredRecipes($name, $description, $tags, $country, $onlyMine = 0)
+    {
+        $addSql = "";
+        $addSql .= empty($name) ? "" : " AND r.name LIKE '%$name%'";
+        $addSql .= empty($description) ? "" : " AND r.description LIKE '%$description%'";
+        $addSql .= empty($country) ? "" : " AND r.country = '$country'";
+        if (!empty($onlyMine) && $_SESSION['admin'] == 0 && isset($_SESSION['user_id'])) {
+            $addSql .= " AND r.userID = ".$_SESSION['user_id']."";
+        }
+        $addSql .= empty($tags) ? "" : " AND t.description LIKE '%$tags%'";
+
+
+        $db = new DBConnection();
+        $sql = "SELECT
+                    r.id AS recipe_id,
+                    r.name AS recipe_name,
+                    r.description,
+                    r.country,
+                    t.description AS tag_name,
+                    t.id AS tag_id,
+                    users.username
+                FROM
+                    recipes r
+                        LEFT JOIN
+                    recipetags rt ON (r.id = rt.recipeID)
+                        LEFT JOIN
+                    tags t ON (t.id = rt.tagID)
+                        LEFT JOIN
+                    users ON (users.id = r.userID)
+                WHERE
+                    1 = 1
+                ";
+        $sql .= $addSql;
+        $sql .= " GROUP BY r.id ORDER BY date_added DESC";
+        //print_r($sql);exit;
+        return $db->getMultipleResultSet($sql);
+    }
+
+    /**
+     * Delete a recipe
+     * @param $recipeId
+     * @return bool
+     */
+    public function deleteRecipe($recipeId)
+    {
+        $dbConnection = new DBConnection();
+
+        $sql = "DELETE FROM recipetags WHERE recipeID = $recipeId";
+        $dbConnection->executeUpdate($sql);
+
+        $sql = "DELETE FROM recipes WHERE id = $recipeId";
+        $dbConnection->executeUpdate($sql);
+
+        return true;
     }
 }

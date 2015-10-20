@@ -33,6 +33,7 @@ if (isset($_POST['Login'])) {
                     $_SESSION['is_logged_in'] = true;
                     $_SESSION['username'] = $userDetails['username'];
                     $_SESSION['user_id'] = $userDetails['id'];
+                    $_SESSION['admin'] = $userDetails['is_admin'];
                 } else {
                     $_SESSION['error_message'] = "Sorry, your credentials are incorrect. Please try again";
                 }
