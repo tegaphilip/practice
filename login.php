@@ -32,6 +32,7 @@ if (isset($_POST['Login'])) {
                 if (password_verify($password, $userDetails['password'])) {
                     $_SESSION['is_logged_in'] = true;
                     $_SESSION['username'] = $userDetails['username'];
+                    $_SESSION['user_id'] = $userDetails['id'];
                 } else {
                     $_SESSION['error_message'] = "Sorry, your credentials are incorrect. Please try again";
                 }

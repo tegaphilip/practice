@@ -1,9 +1,39 @@
 <?php
 session_start();
+
+require_once 'classes/Recipe.php';
+require_once 'classes/Category.php';
+
 $error_message = "";
 if (!isset($_SESSION['is_logged_in'])) {
     $_SESSION['error_message'] = "You are not logged in!";
     header("Location:index.php");
+}
+
+$category = new Category();
+$categories = $category->getAllCategories();
+$error_message = "";
+$info = "";
+
+if (isset($_POST['Add'])) {
+
+    $recipe = new Recipe();
+
+    $country = $_POST['country'];
+    $name = $_POST['name'];
+    $description = $_POST['description'];
+    $tags = $_POST['tags'];
+
+    $response = $recipe->addRecipe($name, $country, $tags, $description);
+
+    if (!$response) {
+        if (isset($_SESSION['error_message'])) {
+            $error_message = $_SESSION['error_message'];
+            unset($_SESSION['error_message']);
+        }
+    } else {
+        $info = "Recipe created successfully!";
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -29,44 +59,68 @@ if (!isset($_SESSION['is_logged_in'])) {
 
 
 
-            <form method="post" action="add_recipe_action.php" id="add-recipe-form">
+            <form method="post" action="" id="add-recipe-form">
                 <table width="30%" cellpadding="2" cellspacing="5" border="0">
+                    <?php if(!empty($error_message)) {
+                        ?>
+                        <tr>
+                            <td colspan="2">
+                                <div class="error"><?php echo $error_message; ?></div>
+                            </td>
+                        </tr>
+                        <?php
+                    } ?>
+                    <?php if(!empty($info)) {
+                        ?>
+                        <tr>
+                            <td colspan="2">
+                                <div class="info"><?php echo $info; ?></div>
+                            </td>
+                        </tr>
+                    <?php } ?>
                     <tr>
                         <td colspan="2">
-                            <select name="country" id="country">
+                            <select name="country" id="country" required>
                                 <option value="">Country</option>
-                                <option value="China">China</option>
-                                <option value="France">France</option>
-                                <option value="Germany">Germany</option>
-                                <option value="Ghana">Ghana</option>
-                                <option value="India">India</option>
-                                <option value="Nepal">Nepal</option>
-                                <option value="Nigeria">Nigeria</option>
-                                <option value="USA">USA</option>
+                                <?php
+                                    $countries = require_once('_country.php');
+                                    foreach  ($countries as $key => $value) {
+                                        ?>
+                                    <option value="<?php echo $key;?>" <?php if (isset($country) && $key == $country) { echo "selected";} ?>>
+                                        <?php echo $value; ?>
+                                    </option>
+                                        <?php
+                                    }
+                                ?>
                             </select>
                         </td>
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <input type="text" name="name" id="name" placeholder="Name">
+                            <input type="text" name="name" id="name" placeholder="Name" value="<?php if( isset($name)) { echo $name;} ?>" required>
                         </td>
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <textarea name="description" id="description" placeholder="Description" rows="15" cols="50"></textarea>
+                            <textarea required name="description" id="description" placeholder="Description" rows="15" cols="50"><?php if( isset($description)) { echo $description;} ?></textarea>
                         </td>
                     </tr>
 
                     <tr>
-                        <td>Select Tags</td>
+                        <td colspan="2">Select Tags (hold the shift key to select multiple tags)</td>
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <select multiple name="tags" id="tags">
-                                <option>Chinese</option>
-                                <option>Nierian</option>
-                                <option>Cousine</option>
-                                <option>CousCoussssssssssss</option>
+                            <select multiple name="tags[]" id="tags">
+                                <?php
+                                    foreach ($categories as $cat) {
+                                        ?>
+                                <option value="<?php echo $cat['id']; ?>">
+                                    <?php echo $cat['description']; ?>
+                                </option>
+                                        <?php
+                                    }
+                                ?>
                             </select>
                         </td>
                     </tr>
