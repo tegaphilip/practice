@@ -3,12 +3,10 @@ session_start();
 
 require_once 'classes/Recipe.php';
 require_once 'classes/Category.php';
+require_once 'classes/Util.php';
 
-$error_message = "";
-if (!isset($_SESSION['is_logged_in'])) {
-    $_SESSION['error_message'] = "You are not logged in!";
-    header("Location:index.php");
-}
+$util = new Util();
+$util->validateUser();
 
 $category = new Category();
 $categories = $category->getAllCategories();

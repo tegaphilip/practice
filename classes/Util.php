@@ -50,4 +50,32 @@ class Util
             header("Location:index.php");
         }
     }
+
+    /**
+     *
+     */
+    public function validateAdmin()
+    {
+        $this->validateUser();
+
+        if (!isset($_SESSION['admin']) || $_SESSION['admin'] == 0) {
+            $_SESSION['error_message'] = "You are not authorised to view this page";
+            header("Location:index.php");
+        }
+    }
+
+
+    /**
+     * Encrypt password
+     * @param $password
+     * @return bool|string
+     */
+    public function encryptPassword($password)
+    {
+        $options = [
+            'cost' => 11,
+            'salt' => mcrypt_create_iv(22, MCRYPT_DEV_URANDOM),
+        ];
+        return  password_hash($password, PASSWORD_BCRYPT, $options);
+    }
 }

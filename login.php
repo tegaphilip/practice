@@ -13,8 +13,8 @@ if (isset($_POST['Login'])) {
     } else {
         //connect to mysql database
         $mysqli = new mysqli($db_host,$db_login,$db_password,$db_name);
-        //$username = $mysqli->real_escape_string($username);
-        //$password = $mysqli->real_escape_string($password);
+        $username = $mysqli->real_escape_string($username);
+        $password = $mysqli->real_escape_string($password);
 
         if ($mysqli->connect_errno) {
             $_SESSION['error_message'] = "Sorry, there is a problem with our server at the moment. Please try again shortly";

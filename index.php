@@ -69,7 +69,7 @@ if (isset($_GET['name']) || isset($_GET['description']) || isset($_GET['tags']) 
                     <?php
                 } else {
                     ?>
-                    <a href="#" id="new-recipe-link">
+                    <a href="settings.php" id="new-recipe-link">
                         <button>Admin Settings</button>
                     </a>
                     <?php
@@ -132,7 +132,7 @@ if (isset($_GET['name']) || isset($_GET['description']) || isset($_GET['tags']) 
                             </td>
                             <td>
                                 <a class="no-decorate" href="view_recipe.php?recipe_id=<?php echo $util->encryptPK($line['recipe_id']); ?>">
-                                    <?php echo $line['description'];?>
+                                    <?php echo strlen($line['description']) > 80 ? "<span class='ellipsis'>" . substr($line['description'],0,80)."...</span>" : $line['description']; ?>
                                 </a>
                             </td>
                             <td>

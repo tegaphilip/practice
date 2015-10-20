@@ -139,3 +139,14 @@ button {
     text-decoration: none;
     color: inherit;
 }
+
+.ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.very-large{
+    width: 200px;
+    height: 50px;
+}
