@@ -35,10 +35,13 @@ $util->validateAdmin();
                     </tr>
 
                     <tr>
-                        <td><button class="very-large">Manage Categories</button></td>
+                        <td>
+                            <a href="categories.php">
+                                <button class="very-large">Manage Categories</button>
+                            </a>
+                        </td>
 
                     </tr>
-
 
                 </table>
             </div>

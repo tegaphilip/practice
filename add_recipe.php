@@ -117,7 +117,7 @@ if (isset($_POST['Add'])) {
                                 ?>
                             </select>
                         </td>
-                        <td><a href="new_category.php">Add New</a></td>
+                        <td><a href="add_category.php">Add New</a></td>
                     </tr>
                     <tr>
                         <td><button type="reset">Cancel</button></td>

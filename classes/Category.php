@@ -1,4 +1,5 @@
 <?php
+require_once 'DBConnection.php';
 
 class Category
 {
@@ -7,20 +8,11 @@ class Category
         $dbConnection = new DBConnection();
         $mysqli = $dbConnection->getDBConnection();
 
-        if (is_null($mysqli)) {
-            $_SESSION['error_message'] = "There was a problem connecting with the database";
-            return false;
-        }
-
-        if (!isset($_SESSION['user_id'])) {
-            $_SESSION['error_message'] = "You are not logged in";
-            header("Location:index.php");
-        }
 
         //check if recipe with that name has been created before
         $tagName = $mysqli->real_escape_string($tagName);
         $sql = "SELECT * FROM tags WHERE description = '$tagName'";
-        $result = $dbConnection->getResultSet($sql);
+        $result = $dbConnection->getMultipleResultSet($sql);
 
         if (!empty($result)) {
             $_SESSION['error_message'] = "A tag with that name has already been created";
@@ -63,7 +55,7 @@ class Category
 
         //Update the recipe with the appropriate recipe tags
         $sql = "UPDATE tags
-                    SET description = '$tagName',
+                    SET description = '$tagName'
                 WHERE id = $tagId";
         $result = $dbConnection->executeUpdate($sql);
         if (empty($result)) {
@@ -81,6 +73,39 @@ class Category
     {
         $db = new DBConnection();
 
-        return $db->getMultipleResultSet("SELECT * FROM tags ORDER BY description");
+        return $db->getMultipleResultSet(
+            "SELECT tags.*,users.username
+             FROM tags
+             LEFT JOIN users ON (users.id = tags.userID)
+             ORDER BY description");
+    }
+
+    /**
+     * @param $categoryId
+     * @return bool
+     */
+    public function deleteCategory($categoryId)
+    {
+        $dbConnection = new DBConnection();
+
+        $sql = "DELETE FROM recipetags WHERE tagID = $categoryId";
+        $dbConnection->executeUpdate($sql);
+
+        $sql = "DELETE FROM tags WHERE id = $categoryId";
+        $dbConnection->executeUpdate($sql);
+
+        return true;
+    }
+
+
+    /**
+     * @param $categoryId
+     * @return array|bool
+     */
+    public function getCategory($categoryId)
+    {
+        $sql = "SELECT * FROM tags WHERE id = $categoryId";
+        $dbConnection = new DBConnection();
+        return $dbConnection->getSingleResultSet($sql);
     }
 }
