@@ -22,7 +22,7 @@ if (isset($_POST['Add'])) {
     $description = $_POST['description'];
     $tags = $_POST['tags'];
 
-    $response = $recipe->addRecipe($name, $country, $tags, $description);
+    $response = $recipe->addRecipe($name, $country, $tags, $description, $_FILES['recipe_image']);
 
     if (!$response) {
         if (isset($_SESSION['error_message'])) {
@@ -53,7 +53,7 @@ if (isset($_POST['Add'])) {
 
 
 
-            <form method="post" action="" id="add-recipe-form">
+            <form method="post" action="" id="add-recipe-form" enctype="multipart/form-data">
                 <table width="30%" cellpadding="2" cellspacing="5" border="0">
                     <?php if(!empty($error_message)) {
                         ?>
@@ -72,6 +72,11 @@ if (isset($_POST['Add'])) {
                             </td>
                         </tr>
                     <?php } ?>
+                    <tr>
+                        <td colspan="2">
+                            <input type="file" name="recipe_image">
+                        </td>
+                    </tr>
                     <tr>
                         <td colspan="2">
                             <select name="country" id="country" required>

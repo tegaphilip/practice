@@ -49,6 +49,18 @@ if (isset($_GET['recipe_id'])) {
             <form method="post" action="" id="add-recipe-form">
                 <table width="30%" cellpadding="5" cellspacing="5" border="0">
                     <tr>
+                        <td></td>
+                        <td>
+                            <?php
+                                $image = "default.png";
+                                if (isset($recipeDetails['photo'])) {
+                                    $image = $recipeDetails['photo'];
+                                }
+                            ?>
+                            <img src="image_uploads/<?php echo $image; ?>" width="200" height="200">
+                        </td>
+                    </tr>
+                    <tr>
                         <td>Country</td>
                         <td><?php echo $recipeDetails['country']; ?></td>
                     </tr>

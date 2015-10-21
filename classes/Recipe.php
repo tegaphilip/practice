@@ -12,8 +12,20 @@ class Recipe
      * @param $description
      * @return bool
      */
-    public function addRecipe($name, $country, $tags = [], $description)
+    public function addRecipe($name, $country, $tags = array(), $description, $file = array())
     {
+        $image = "";
+        if (!empty($file['name'])) {
+            $imageUploadDir = 'image_uploads';
+            $upload = Util::uploadFile($file, 'image', $imageUploadDir);
+            if ($upload['status']) {
+                $image = $upload['uploaded_name'];
+            } else {
+                $_SESSION['error_message'] = $upload['error'];
+                return false;
+            }
+        }
+
         $dbConnection = new DBConnection();
         $mysqli = $dbConnection->getDBConnection();
 
@@ -47,8 +59,8 @@ class Recipe
         $description = $mysqli->real_escape_string($description);
         $id = $_SESSION['user_id'];
 
-        $sql = "INSERT INTO recipes (name, description, country, userID, date_added) VALUES
-                                    ('$name','$description','$country', $id, '".date("Y-m-d H:i:s")."')";
+        $sql = "INSERT INTO recipes (name, description, country, userID, date_added,photo) VALUES
+                                    ('$name','$description','$country', $id, '".date("Y-m-d H:i:s")."', '$image')";
         $insertId = $dbConnection->executeInsert($sql);
         if (empty($insertId)) {
             $_SESSION['error_message'] = "Recipe creation failed";

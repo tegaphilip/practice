@@ -78,4 +78,57 @@ class Util
         ];
         return  password_hash($password, PASSWORD_BCRYPT, $options);
     }
+
+
+    public static function uploadFile($dollarUnderScoreFile, $type, $directory)
+    {
+        $maxFileSize = 100; //40mb
+        $response = array();
+        switch ($type) {
+            case "image":
+                $allowed_extensions = array("jpg", "jpeg", "png", "gif");
+                $extension = strtolower(Util::getFileExtension($dollarUnderScoreFile['name']));
+                if (!in_array($extension, $allowed_extensions)) {
+                    $response['status'] = false;
+                    $response['error'] = "Invalid image file";
+                    return $response;
+                }
+                if ($dollarUnderScoreFile['size'] > $maxFileSize * 1024 * 1024) {
+                    $response['status'] = false;
+                    $response['error'] = "Image size must not be greater than {$maxFileSize} MB";
+                    return $response;
+                }
+                $uploaded_name = Util::upload($dollarUnderScoreFile, $directory);
+                if ($uploaded_name == -1) {
+                    $response['status'] = false;
+                    $response['error'] = "Failed uploading image";
+                    return $response;
+                }
+                $response['status'] = true;
+                $response['uploaded_name'] = $uploaded_name;
+                return $response;
+                break;
+            default:
+                break;
+        }
+        return false;
+    }
+
+
+    public static function getFileExtension($fname)
+    {
+        return strtolower(substr($fname, strrpos($fname, ".") + 1));
+    }
+
+    public static function upload($path, $upload_dir)
+    {
+        $random = rand() . substr(str_shuffle("abcdefghijklmnopqrstuvwxyz"), 0, 3) .
+            date("YmdHis") .
+            str_replace(" ", "_", $path['name']);
+        if (move_uploaded_file($path['tmp_name'], $upload_dir . "/" . $random)) {
+            return $random;
+        } else {
+            return -1;
+        }
+    }
 }
