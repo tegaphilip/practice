@@ -1,0 +1,4 @@
+AuthUserFile .htpasswd
+AuthName "Admin Zone - Controlled Access"
+AuthType Basic
+#Require
