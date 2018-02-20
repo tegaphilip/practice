@@ -65,9 +65,11 @@ function ConErrorCsv($download2, $mainInfo2){
     fclose($download2);
 }
 
+
 /*Mobifin file against Networks*/
-if(isset($_POST['submit']) && $_POST['source']!=="")
+if(isset($_POST['submit']) && $_POST['source']!=="" && !empty($_FILES['mobifinfile']['name']))
 {
+    print_r('Got to Mobifin block');
     //upload files and check for validity
     $source = $_POST['source'];
 
@@ -529,9 +531,9 @@ if(isset($_POST['submit']) && $_POST['source']!=="")
 }
 
 /*Creditswitch file against Networks*/
-if(isset($_POST['submit']) )//$_FILES['cswfile'] !==""
+if(isset($_POST['submit'])  && !empty($_FILES['cswfile']['name']))//$_FILES['cswfile'] !==""
 {
-
+    print_r('Got to Creditswitch block');
     //upload files and check for validity
     $source = $_POST['source'];
 
