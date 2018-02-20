@@ -28,21 +28,21 @@ class Config
     private $db_config = array(
 
         array(
-            'name' => 'hocaboo_me',
+            'name' => 'hocaboo_test',
+            'config' => array(
+                'host' => '127.0.0.1',
+                'user' => 'root',
+                'password' => '',
+                'db_name' => 'hocaboo_test_db'
+            )
+        ),
+        array(
+            'name' => 'hocaboo_api',
             'config' => array(
                 'host' => '127.0.0.1',
                 'user' => 'root',
                 'password' => '',
                 'db_name' => 'hocaboo_api'
-            )
-        ),
-        array(
-            'name' => 'hocaboo_dev',
-            'config' => array(
-                'host' => '127.0.0.1',
-                'user' => 'root',
-                'password' => '',
-                'db_name' => 'hocaboo_api_d'
             )
         ),
     );

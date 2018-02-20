@@ -38,7 +38,7 @@ if(isset($argv[1], $argv[2])) {
         echo "No differences between databases.\n\n";
     } else {
         $sql = "SET FOREIGN_KEY_CHECKS = 0;\n" . $sql . "\nSET FOREIGN_KEY_CHECKS = 1;";
-        $fileName = "SQL_Migrate_from_".$diff->getName1()."_to_".$diff->getName2()."_".date("j.n.Y") . '.sql';
+        $fileName = "SQL_Migrate_from_".$diff->getName1()."_to_".$diff->getName2()."_".date("j.n.Y.H") . '.sql';
         $filePath = dirname(__FILE__).DIRECTORY_SEPARATOR.$fileName;
         echo "Generating SQL required to migrate >> " . $diff->getName2() . " to match >>" . $diff->getName1() . "\n";
         file_put_contents(
