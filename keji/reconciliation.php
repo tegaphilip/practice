@@ -68,7 +68,6 @@ function ConErrorCsv($download2, $mainInfo2){
 /*Mobifin file against Networks*/
 if(isset($_POST['submit']) && $_POST['source']!=="")
 {
-    die('Got here');
     //upload files and check for validity
     $source = $_POST['source'];
 
